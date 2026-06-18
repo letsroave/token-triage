@@ -152,6 +152,8 @@ Token savings calculator
 | --- | --- | --- |
 | Marketplace schema | `claude plugin validate .claude-plugin/marketplace.json` | validation passes |
 | Plugin schema | `claude plugin validate plugins/token-triage` | validation passes |
+| Marketplace install | `claude plugin marketplace add https://github.com/letsroave/token-triage` then `claude plugin install token-triage@letsroave` | installs `token-triage@letsroave` |
+| Component inventory | `claude plugin details token-triage@letsroave` | shows 1 skill, ~48 always-on tokens, ~1.4k on invoke |
 | Skill schema | `python /path/to/quick_validate.py plugins/token-triage/skills/token-triage` | `Skill is valid!` |
 | Python syntax | `python -m py_compile plugins/token-triage/skills/token-triage/scripts/*.py` | exits `0` |
 | Folder estimation | `python plugins/token-triage/skills/token-triage/scripts/estimate_context.py plugins/token-triage/skills/token-triage --top 8` | ranks package files and suggests targeted reads |
