@@ -1,0 +1,12 @@
+{
+  "name": "token-triage",
+  "version": "1.2.0",
+  "description": "Token/context cost governor for AI agents. Read less, estimate savings, and choose cheaper workflows before expensive work.",
+  "author": {
+    "name": "letsroave",
+    "url": "https://github.com/letsroave"
+  },
+  "homepage": "https://github.com/letsroave/token-triage",
+  "repository": "https://github.com/letsroave/token-triage",
+  "license": "MIT"
+}

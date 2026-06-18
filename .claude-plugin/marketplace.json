@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "letsroave",
+  "description": "LetsRoave marketplace for practical Claude Code plugins and agent skills.",
+  "owner": {
+    "name": "letsroave"
+  },
+  "plugins": [
+    {
+      "name": "token-triage",
+      "description": "Token/context cost governor for AI agents. Read less, estimate savings, and choose cheaper workflows before expensive work.",
+      "author": {
+        "name": "letsroave"
+      },
+      "category": "productivity",
+      "source": "./plugins/token-triage",
+      "homepage": "https://github.com/letsroave/token-triage"
+    }
+  ]
+}

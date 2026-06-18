@@ -1,6 +1,6 @@
 ---
 name: token-triage
-description: Token and context cost governor for AI agents. Use before expensive work, repo exploration, long document analysis, multi-agent coordination, web research, large file reads, broad code review, feature planning, debugging with unknown scope, summarization, or any task where the agent should inspect less, avoid repeated reads, choose the cheapest adequate workflow, and escalate only when more context is justified.
+description: Token/context cost governor for AI agents. Use before repo exploration, long docs, debugging, reviews, research, or planning to read less and estimate token savings.
 ---
 
 # Token Triage
