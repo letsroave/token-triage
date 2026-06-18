@@ -1,0 +1,4 @@
+interface:
+  display_name: "Token Triage"
+  short_description: "Spend fewer tokens before acting"
+  default_prompt: "Use $token-triage to choose the cheapest adequate path before working on this task."
