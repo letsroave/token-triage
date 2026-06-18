@@ -61,7 +61,7 @@ Copy the installable skill folder into your agent's skill directory:
 cp -R token-triage ~/.codex/skills/token-triage
 ```
 
-For Claude or other agents, copy `token-triage/SKILL.md` into the equivalent skill, project-instruction, or custom-agent workflow location. The skill is plain Markdown plus one dependency-free Python helper, so it does not require a Codex-only runtime.
+For Claude or other agents, copy `token-triage/SKILL.md` into the equivalent skill, project-instruction, or custom-agent workflow location. The skill is plain Markdown plus dependency-free Python helpers, so it does not require a Codex-only runtime.
 
 ## Usage
 
@@ -98,14 +98,15 @@ Example output:
 
 ```text
 Context estimate
-- Files: 6
-- Bytes: 17,122
-- Estimated tokens: 4,283
+- Files: 7
+- Bytes: 24,908
+- Estimated tokens: 6,230
 - Read plan: read targeted files or snippets; avoid rereading
 
-Top 6 largest files:
+Top 7 largest files:
+     1,756 tokens  token-triage/scripts/calculate_savings.py
      1,565 tokens  token-triage/scripts/estimate_context.py
-     1,342 tokens  token-triage/SKILL.md
+     1,533 tokens  token-triage/SKILL.md
 ```
 
 ## Package Layout
@@ -120,7 +121,48 @@ token-triage/
 │   ├── context-read-strategies.md
 │   └── output-contracts.md
 └── scripts/
+    ├── calculate_savings.py
     └── estimate_context.py
+```
+
+## Savings Calculator
+
+Token Triage also includes a calculator for proving whether the workflow actually saved context:
+
+```bash
+python token-triage/scripts/calculate_savings.py \
+  --baseline token-triage \
+  --actual token-triage/SKILL.md token-triage/references/budget-modes.md
+```
+
+Manual usage works when you have token counts from an agent run or provider dashboard:
+
+```bash
+python token-triage/scripts/calculate_savings.py \
+  --baseline-tokens 50000 \
+  --actual-tokens 12000 \
+  --baseline-output-tokens 4000 \
+  --actual-output-tokens 1200 \
+  --runs 20 \
+  --input-price-per-1m 3 \
+  --output-price-per-1m 15
+```
+
+Example output:
+
+```text
+Token savings calculator
+- Baseline input tokens: 50,000
+- Triaged input tokens: 12,000
+- Baseline output tokens: 4,000
+- Triaged output tokens: 1,200
+- Saved per run: 40,800 tokens (75.6%)
+- Saved across 20 run(s): 816,000 tokens
+- Baseline cost per run: $0.210000
+- Triaged cost per run: $0.054000
+- Cost saved per run: $0.156000
+- Cost saved across 20 run(s): $3.120000
+- Input/output delta: 38,000 input, 2,800 output
 ```
 
 ## Design Principles
@@ -133,15 +175,33 @@ token-triage/
 
 ## Validation
 
-The skill was checked with:
+The skill can be checked with:
 
 ```bash
 python -m py_compile token-triage/scripts/estimate_context.py
+python -m py_compile token-triage/scripts/calculate_savings.py
 python token-triage/scripts/estimate_context.py token-triage --top 6
+python token-triage/scripts/calculate_savings.py --baseline token-triage --actual token-triage/SKILL.md
 python /path/to/quick_validate.py token-triage
 ```
 
 If your validator's Python environment does not include `PyYAML`, install it into a temporary local dependency directory and set `PYTHONPATH` for that one validation run.
+
+## Detailed Working Check
+
+This repo's v1.1 check covers the main ways the skill can fail:
+
+| Check | Command | Expected result |
+| --- | --- | --- |
+| Skill schema | `python /path/to/quick_validate.py token-triage` | `Skill is valid!` |
+| Syntax | `python -m py_compile token-triage/scripts/estimate_context.py token-triage/scripts/calculate_savings.py` | exits `0` |
+| Folder estimation | `python token-triage/scripts/estimate_context.py token-triage --top 8` | ranks 7 package files and suggests targeted reads |
+| Stdin estimation | `printf 'compact context check\n' \| python token-triage/scripts/estimate_context.py --stdin` | reports 6 estimated tokens |
+| Manual savings | `python token-triage/scripts/calculate_savings.py --baseline-tokens 50000 --actual-tokens 12000 --baseline-output-tokens 4000 --actual-output-tokens 1200 --runs 20 --input-price-per-1m 3 --output-price-per-1m 15` | reports 816,000 tokens and $3.12 saved across 20 runs |
+| Path savings | `python token-triage/scripts/calculate_savings.py --baseline token-triage --actual token-triage/SKILL.md token-triage/references/budget-modes.md --input-price-per-1m 3` | reports path-based token and dollar savings |
+| Overspend detection | `python token-triage/scripts/calculate_savings.py --baseline-tokens 1000 --actual-tokens 1500 --input-price-per-1m 3` | reports extra tokens and extra cost |
+| Invalid arguments | pass both `--baseline` and `--baseline-tokens` | exits `2` with a clear error |
+| Noise folders | estimate a sample containing `src/`, `node_modules/`, and `build/` | counts only useful source files |
 
 ## Status
 

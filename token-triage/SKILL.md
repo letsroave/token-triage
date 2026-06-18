@@ -86,6 +86,20 @@ python scripts/estimate_context.py . --include "*.py" --exclude "snapshots"
 
 Use the estimate to decide whether to read directly, search first, summarize, or ask for a narrower scope.
 
+## Calculating Savings
+
+Use `scripts/calculate_savings.py` after choosing or completing a triaged path. It compares a baseline context plan against the actual or proposed triaged context and reports tokens saved, percent saved, repeated-run savings, and optional dollar savings.
+
+Examples:
+
+```bash
+python scripts/calculate_savings.py --baseline . --actual src tests
+python scripts/calculate_savings.py --baseline-tokens 50000 --actual-tokens 12000 --runs 20
+python scripts/calculate_savings.py --baseline-tokens 50000 --actual-tokens 12000 --input-price-per-1m 3
+```
+
+Use manual token inputs when the baseline is a mental plan, another agent run, or a provider usage report. Use path inputs when comparing "read the whole repo" against "read these files only."
+
 ## Safety And Accuracy Guardrail
 
 Never save tokens by skipping required verification for current facts, legal, medical, financial, security, safety, compliance, or production-impacting claims. In those cases, escalate to authoritative sources, tests, or explicit uncertainty.
